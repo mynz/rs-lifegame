@@ -9,20 +9,48 @@ use ggez::{Context, GameResult};
 use std::env;
 use std::path;
 
+//use std::array;
+
+struct Grid {
+    width: u32,
+    height: u32,
+    cells: Vec<bool>,
+}
+
+impl Grid {
+    fn new(w: u32, h: u32) -> Grid {
+        let size = (w * h) as usize;
+
+        Grid {
+            width: w,
+            height: h,
+            cells: Vec::with_capacity(size),
+        }
+    }
+}
+
 // First we make a structure to contain the game's state
 struct MainState {
+    grid: Grid,
+
     text: graphics::Text,
     frames: usize,
 }
 
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<MainState> {
+        let grid = Grid::new(10, 10);
+
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
         let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48)?;
         let text = graphics::Text::new(ctx, "Hello world!", &font)?;
 
-        let s = MainState { text, frames: 0 };
+        let s = MainState {
+            grid,
+            text,
+            frames: 0,
+        };
         Ok(s)
     }
 }
@@ -81,4 +109,3 @@ pub fn main() {
         println!("Game exited cleanly.");
     }
 }
-
