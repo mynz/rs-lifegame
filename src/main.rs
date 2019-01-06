@@ -71,6 +71,16 @@ impl event::EventHandler for MainState {
         // Drawables are drawn from their top-left corner.
         let dest_point = graphics::Point2::new(10.0, 10.0);
         graphics::draw(ctx, &self.text, dest_point, 0.0)?;
+
+        let rect = graphics::Rect {
+            x: 0.0,
+            y: 0.0,
+            w: 10.0,
+            h: 10.0,
+        };
+        graphics::rectangle(ctx, graphics::DrawMode::Fill, rect)?;
+
+        // draw them all.
         graphics::present(ctx);
 
         self.frames += 1;
