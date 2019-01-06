@@ -1,5 +1,7 @@
 //! Basic hello world example.
 
+#![allow(dead_code)]
+
 extern crate ggez;
 
 use ggez::conf;
@@ -17,28 +19,66 @@ struct Grid {
     cells: Vec<bool>,
 }
 
-impl std::iter::Iterator for Grid {
+struct GridIter<'a> {
+    grid: &'a Grid,
+    index: usize,
+}
+
+impl<'a> std::iter::Iterator for GridIter<'a> {
     type Item = bool;
 
     fn next(&mut self) -> Option<Self::Item> {
-        None
+        let s = self.grid.cells.len();
+
+        if self.index < s {
+            let b = self.grid.cells[self.index];
+            self.index += 1;
+            Some(b)
+        } else {
+            None
+        }
     }
 }
 
 #[test]
 fn test_grid_iter() {
     assert!(true);
+
+    let grid = Grid::new(2, 2);
+
+    {
+        let mut iter = grid.get_iter();
+        assert!(iter.next() == Some(false));
+        assert!(iter.next() == Some(false));
+        assert!(iter.next() == Some(false));
+        assert!(iter.next() == Some(false));
+        assert!(iter.next() == None);
+    }
+
+    for item in grid.get_iter() {
+        assert!(item == false);
+    }
 }
 
-impl Grid {
+impl<'a> Grid {
     fn new(w: u32, h: u32) -> Grid {
         let size = (w * h) as usize;
+
+        let cells = vec![false; size];
 
         Grid {
             width: w,
             height: h,
-            cells: Vec::with_capacity(size),
+            cells,
         }
+    }
+
+    fn get_iter(&self) -> GridIter {
+        let ret = GridIter {
+            grid: self,
+            index: 0,
+        };
+        ret
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
