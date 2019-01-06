@@ -79,6 +79,15 @@ impl<'a> Grid {
         (x, y)
     }
 
+    fn get_index_from_position(&self, pos: (u32, u32)) -> u32 {
+        pos.1 * self.width + pos.0
+    }
+
+    fn set_cell(&mut self, pos: (u32, u32), b: bool) {
+        let idx = self.get_index_from_position(pos);
+        self.cells[idx as usize] = b;
+    }
+
     fn get_iter(&self) -> GridIter {
         let ret = GridIter {
             grid: self,
@@ -97,6 +106,19 @@ impl<'a> Grid {
             h: (span - 2) as f32,
         };
 
+        let red = graphics::Color {
+            r: 1.0,
+            g: 0.0,
+            b: 0.0,
+            a: 1.0,
+        };
+        let blue = graphics::Color {
+            r: 0.5,
+            g: 0.5,
+            b: 0.5,
+            a: 1.0,
+        };
+
         for (i, e) in self.cells.iter().enumerate() {
             let (x, y) = self.get_position_with_index(i as u32);
 
@@ -106,6 +128,7 @@ impl<'a> Grid {
             rect.x = px as f32;
             rect.y = py as f32;
 
+            graphics::set_color(ctx, if *e { red } else { blue });
             graphics::rectangle(ctx, graphics::DrawMode::Fill, rect)?;
         }
 
@@ -123,7 +146,8 @@ struct MainState {
 
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<MainState> {
-        let grid = Grid::new(10, 10);
+        let mut grid = Grid::new(10, 10);
+        grid.set_cell((1, 1), true);
 
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
