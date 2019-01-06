@@ -73,6 +73,12 @@ impl<'a> Grid {
         }
     }
 
+    fn get_position_with_index(&self, index: u32) -> (u32, u32) {
+        let x = index % self.width;
+        let y = index / self.width;
+        (x, y)
+    }
+
     fn get_iter(&self) -> GridIter {
         let ret = GridIter {
             grid: self,
@@ -82,14 +88,26 @@ impl<'a> Grid {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        // todo
-        let rect = graphics::Rect {
+        let span = 30;
+
+        let mut rect = graphics::Rect {
             x: 0.0,
             y: 0.0,
-            w: 10.0,
-            h: 10.0,
+            w: (span - 2) as f32,
+            h: (span - 2) as f32,
         };
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, rect)?;
+
+        for (i, e) in self.cells.iter().enumerate() {
+            let (x, y) = self.get_position_with_index(i as u32);
+
+            let px = x * span;
+            let py = y * span;
+
+            rect.x = px as f32;
+            rect.y = py as f32;
+
+            graphics::rectangle(ctx, graphics::DrawMode::Fill, rect)?;
+        }
 
         Ok(())
     }
