@@ -88,6 +88,12 @@ impl<'a> Grid {
         self.cells[idx as usize] = b;
     }
 
+    fn toggle_cell(&mut self, pos: (u32, u32)) {
+        let idx = self.get_index_from_position(pos) as usize;
+        let b = !self.cells[idx];
+        self.cells[idx] = b;
+    }
+
     fn get_iter(&self) -> GridIter {
         let ret = GridIter {
             grid: self,
@@ -171,8 +177,15 @@ impl MainState {
 impl ggez::event::EventHandler for MainState {
     fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
         println!("key_down_event: {:?}, {:?}, {:?}", ctx, keycode, keymod);
-        if keycode == Keycode::Q {
-            ctx.quit();
+
+        match keycode {
+            Keycode::Q => {
+                ctx.quit();
+            }
+            Keycode::N => {
+                self.grid.toggle_cell((2, 2));
+            }
+            _ => {}
         }
     }
 
