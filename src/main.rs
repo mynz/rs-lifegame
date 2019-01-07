@@ -5,7 +5,7 @@
 extern crate ggez;
 
 use ggez::conf;
-use ggez::event;
+use ggez::event::{self, Keycode, Mod};
 use ggez::graphics;
 use ggez::{Context, GameResult};
 use std::env;
@@ -168,7 +168,14 @@ impl MainState {
 //
 // The `EventHandler` trait also contains callbacks for event handling
 // that you can override if you wish, but the defaults are fine.
-impl event::EventHandler for MainState {
+impl ggez::event::EventHandler for MainState {
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
+        println!("key_down_event: {:?}, {:?}, {:?}", ctx, keycode, keymod);
+        if keycode == Keycode::Q {
+            ctx.quit();
+        }
+    }
+
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
         Ok(())
     }
