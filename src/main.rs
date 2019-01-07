@@ -134,7 +134,7 @@ impl<'a> Grid {
             rect.x = px as f32;
             rect.y = py as f32;
 
-            graphics::set_color(ctx, if *e { red } else { blue });
+            graphics::set_color(ctx, if *e { red } else { blue })?;
             graphics::rectangle(ctx, graphics::DrawMode::Fill, rect)?;
         }
 
@@ -175,14 +175,15 @@ impl MainState {
 // The `EventHandler` trait also contains callbacks for event handling
 // that you can override if you wish, but the defaults are fine.
 impl ggez::event::EventHandler for MainState {
-    fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, _repeat: bool) {
         println!("key_down_event: {:?}, {:?}, {:?}", ctx, keycode, keymod);
 
         match keycode {
             Keycode::Q => {
-                ctx.quit();
+                ctx.quit().unwrap();
             }
-            Keycode::N => {
+
+            Keycode::Space | Keycode::N => {
                 self.grid.toggle_cell((2, 2));
             }
             _ => {}
