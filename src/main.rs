@@ -3,15 +3,15 @@
 #![allow(dead_code)]
 
 extern crate ggez;
+extern crate rand;
 
 use ggez::conf;
 use ggez::event::{self, Keycode, Mod};
 use ggez::graphics;
 use ggez::{Context, GameResult};
+//use rand::random;
 use std::env;
 use std::path;
-
-//use std::array;
 
 struct Grid {
     width: u32,
@@ -100,11 +100,15 @@ impl<'a> Grid {
         ret
     }
 
+    fn new_cells(&self) -> Vec<bool> {
+        let size = (self.width * self.height) as usize;
+        vec![false; size]
+    }
+
     fn next_generation(&mut self) {
         let w = self.width as i32;
         let h = self.height as i32;
-        let size = (w * h) as usize;
-        let mut new_cells = vec![false; size];
+        let mut new_cells = self.new_cells();
 
         let fn_round = |v, n| {
             if v < 0 {
@@ -150,6 +154,12 @@ impl<'a> Grid {
         }
 
         self.cells = new_cells;
+    }
+
+    fn random_cells(&mut self) {
+        for e in self.cells.iter_mut() {
+            *e = rand::random();
+        }
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
@@ -233,8 +243,16 @@ impl ggez::event::EventHandler for MainState {
                 ctx.quit().unwrap();
             }
 
-            Keycode::Space | Keycode::N => {
+            Keycode::B => {
                 self.grid.toggle_cell((2, 2));
+            }
+
+            Keycode::R => {
+                self.grid.random_cells();
+            }
+
+            Keycode::Space | Keycode::N => {
+                self.grid.next_generation();
             }
             _ => {}
         }
