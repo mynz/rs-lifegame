@@ -63,9 +63,7 @@ fn test_grid_iter() {
 impl<'a> Grid {
     fn new(w: u32, h: u32) -> Grid {
         let size = (w * h) as usize;
-
         let cells = vec![false; size];
-
         Grid {
             width: w,
             height: h,
@@ -73,23 +71,23 @@ impl<'a> Grid {
         }
     }
 
-    fn get_position_with_index(&self, index: u32) -> (u32, u32) {
+    fn get_position_with_index(&self, index: u32) -> (i32, i32) {
         let x = index % self.width;
         let y = index / self.width;
-        (x, y)
+        (x as i32, y as i32)
     }
 
-    fn get_index_from_position(&self, pos: (u32, u32)) -> u32 {
-        pos.1 * self.width + pos.0
+    fn get_index_from_position(&self, pos: (u32, u32)) -> usize {
+        (pos.1 * self.width + pos.0) as usize
     }
 
     fn set_cell(&mut self, pos: (u32, u32), b: bool) {
         let idx = self.get_index_from_position(pos);
-        self.cells[idx as usize] = b;
+        self.cells[idx] = b;
     }
 
     fn toggle_cell(&mut self, pos: (u32, u32)) {
-        let idx = self.get_index_from_position(pos) as usize;
+        let idx = self.get_index_from_position(pos);
         let b = !self.cells[idx];
         self.cells[idx] = b;
     }
@@ -100,6 +98,58 @@ impl<'a> Grid {
             index: 0,
         };
         ret
+    }
+
+    fn next_generation(&mut self) {
+        let w = self.width as i32;
+        let h = self.height as i32;
+        let size = (w * h) as usize;
+        let mut new_cells = vec![false; size];
+
+        let fn_round = |v, n| {
+            if v < 0 {
+                n - 1
+            } else if v >= n {
+                0
+            } else {
+                v
+            }
+        };
+
+        for (i, e) in self.cells.iter().enumerate() {
+            let (x, y) = self.get_position_with_index(i as u32);
+
+            let tbl = [
+                (-1, 1),
+                (0, 1),
+                (1, 1),
+                (-1, 0),
+                (1, 0),
+                (-1, -1),
+                (0, -1),
+                (1, -1),
+            ];
+
+            let mut count = 0;
+            for t in tbl.into_iter() {
+                let npos = (x + t.0, y + t.1);
+                let nx = fn_round(npos.0, w) as u32;
+                let ny = fn_round(npos.1, h) as u32;
+                let index = self.get_index_from_position((nx, ny));
+                if self.cells[index] {
+                    count += 1;
+                }
+            }
+
+            let b = if *e {
+                count == 2 || count == 3
+            } else {
+                count == 3
+            };
+            new_cells[i] = b;
+        }
+
+        self.cells = new_cells;
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
