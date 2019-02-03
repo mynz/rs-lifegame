@@ -16,6 +16,7 @@ use std::path;
 struct Grid {
     width: u32,
     height: u32,
+    span: u32,
     cells: Vec<bool>,
 }
 
@@ -61,13 +62,14 @@ fn test_grid_iter() {
 }
 
 impl<'a> Grid {
-    fn new(w: u32, h: u32) -> Grid {
+    fn new(w: u32, h: u32, span: u32) -> Grid {
         let size = (w * h) as usize;
         let cells = vec![false; size];
         Grid {
             width: w,
             height: h,
             cells,
+            span,
         }
     }
 
@@ -163,7 +165,7 @@ impl<'a> Grid {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        let span = 30;
+        let span = self.span;
 
         let mut rect = graphics::Rect {
             x: 0.0,
@@ -188,8 +190,8 @@ impl<'a> Grid {
         for (i, e) in self.cells.iter().enumerate() {
             let (x, y) = self.get_position_with_index(i as u32);
 
-            let px = x * span;
-            let py = y * span;
+            let px = x * span as i32;
+            let py = y * span as i32;
 
             rect.x = px as f32;
             rect.y = py as f32;
@@ -212,7 +214,7 @@ struct MainState {
 
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<MainState> {
-        let mut grid = Grid::new(16, 20);
+        let mut grid = Grid::new(16, 20, 30);
         grid.set_cell((1, 1), true);
 
         // The ttf file will be in your resources directory. Later, we
@@ -258,8 +260,20 @@ impl ggez::event::EventHandler for MainState {
         }
     }
 
-    fn mouse_button_down_event(&mut self, _ctx: &mut Context, _button: MouseButton, _x: i32, _y: i32) {
+    fn mouse_button_down_event(
+        &mut self,
+        _ctx: &mut Context,
+        _button: MouseButton,
+        _x: i32,
+        _y: i32,
+    ) {
         println!("mouse down event occured: #{:?}", (_button, _x, _y));
+
+        let span = self.grid.span;
+        let gx = _x as u32 / span;
+        let gy = _y as u32 / span;
+
+        self.grid.toggle_cell((gx, gy));
     }
 
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
