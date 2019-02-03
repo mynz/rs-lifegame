@@ -6,7 +6,7 @@ extern crate ggez;
 extern crate rand;
 
 use ggez::conf;
-use ggez::event::{self, Keycode, Mod};
+use ggez::event::{self, Keycode, Mod, MouseButton};
 use ggez::graphics;
 use ggez::{Context, GameResult};
 //use rand::random;
@@ -212,7 +212,7 @@ struct MainState {
 
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<MainState> {
-        let mut grid = Grid::new(10, 10);
+        let mut grid = Grid::new(16, 20);
         grid.set_cell((1, 1), true);
 
         // The ttf file will be in your resources directory. Later, we
@@ -256,6 +256,10 @@ impl ggez::event::EventHandler for MainState {
             }
             _ => {}
         }
+    }
+
+    fn mouse_button_down_event(&mut self, _ctx: &mut Context, _button: MouseButton, _x: i32, _y: i32) {
+        println!("mouse down event occured: #{:?}", (_button, _x, _y));
     }
 
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
