@@ -210,6 +210,7 @@ struct MainState {
 
     text: graphics::Text,
     frames: usize,
+    debug_mode: bool,
 }
 
 impl MainState {
@@ -226,6 +227,7 @@ impl MainState {
             grid,
             text,
             frames: 0,
+            debug_mode: false,
         };
         Ok(s)
     }
@@ -251,6 +253,10 @@ impl ggez::event::EventHandler for MainState {
 
             Keycode::R => {
                 self.grid.random_cells();
+            }
+
+            Keycode::D => {
+                self.debug_mode = !self.debug_mode;
             }
 
             Keycode::Space | Keycode::N => {
@@ -285,17 +291,21 @@ impl ggez::event::EventHandler for MainState {
 
         self.grid.draw(ctx)?;
 
-        // Drawables are drawn from their top-left corner.
-        let dest_point = graphics::Point2::new(10.0, 10.0);
-        graphics::draw(ctx, &self.text, dest_point, 0.0)?;
+
+        self.frames += 1;
+
+        // debug draw
+        if self.debug_mode {
+            // Drawables are drawn from their top-left corner.
+            let dest_point = graphics::Point2::new(10.0, 10.0);
+            graphics::draw(ctx, &self.text, dest_point, 0.0)?;
+            if (self.frames % 100) == 0 {
+                println!("FPS: {}", ggez::timer::get_fps(ctx));
+            }
+        }
 
         // draw them all.
         graphics::present(ctx);
-
-        self.frames += 1;
-        if (self.frames % 100) == 0 {
-            println!("FPS: {}", ggez::timer::get_fps(ctx));
-        }
 
         Ok(())
     }
