@@ -320,8 +320,11 @@ impl ggez::event::EventHandler for MainState {
 // do the work of creating our MainState and running our game.
 // * Then, just call `game.run()` which runs the `Game` mainloop.
 pub fn main() {
-    let c = conf::Conf::new();
-    let ctx = &mut Context::load_from_conf("helloworld", "ggez", c).unwrap();
+    let mut c = conf::Conf::new();
+    c.window_mode.width = 640;
+    c.window_mode.height = 640;
+    c.window_setup.resizable = true;
+    let ctx = &mut Context::load_from_conf("rs_lifegame", "mynz", c).unwrap();
 
     // We add the CARGO_MANIFEST_DIR/resources to the filesystem's path
     // so that ggez will look in our cargo project directory for files.
