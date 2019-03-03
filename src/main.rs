@@ -300,12 +300,10 @@ impl ggez::event::EventHandler for MainState {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx);
-
-        self.grid.draw(ctx)?;
-
-
         self.frames += 1;
+
+        graphics::clear(ctx);
+        self.grid.draw(ctx)?;
 
         // debug draw
         if self.debug_mode {
@@ -336,6 +334,7 @@ pub fn main() {
     let mut c = conf::Conf::new();
     c.window_mode.width = 640;
     c.window_mode.height = 640;
+    c.window_mode.vsync = true;
     c.window_setup.resizable = true;
     let ctx = &mut Context::load_from_conf("rs_lifegame", "mynz", c).unwrap();
 
