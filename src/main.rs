@@ -169,8 +169,8 @@ impl<'a> Grid {
         let span = self.span;
 
         let mut rect = graphics::Rect {
-            x: 0.0,
-            y: 0.0,
+            x: 1.0,
+            y: 1.0,
             w: (span - 2) as f32,
             h: (span - 2) as f32,
         };
@@ -191,8 +191,8 @@ impl<'a> Grid {
         for (i, e) in self.cells.iter().enumerate() {
             let (x, y) = self.get_position_with_index(i as u32);
 
-            let px = x * span as i32;
-            let py = y * span as i32;
+            let px = x * span as i32 + 1;
+            let py = y * span as i32 + 1;
 
             rect.x = px as f32;
             rect.y = py as f32;
@@ -216,8 +216,8 @@ struct MainState {
 }
 
 impl MainState {
-    fn new(ctx: &mut Context) -> GameResult<MainState> {
-        let mut grid = Grid::new(16, 20, 30);
+    fn new(ctx: &mut Context, x: u32, y: u32, span: u32) -> GameResult<MainState> {
+        let mut grid = Grid::new(x, y, span);
         grid.set_cell((1, 1), true);
 
         // The ttf file will be in your resources directory. Later, we
@@ -322,6 +322,12 @@ impl ggez::event::EventHandler for MainState {
     }
 }
 
+fn calc_window_size(x: u32, y: u32, span: u32) -> (u32,u32) {
+    //let ret = (100, 100);
+    let ret = (x * span, y * span);
+    ret
+}
+
 // Now our main function, which does three things:
 //
 // * First, create a new `ggez::conf::Conf`
@@ -331,9 +337,14 @@ impl ggez::event::EventHandler for MainState {
 // do the work of creating our MainState and running our game.
 // * Then, just call `game.run()` which runs the `Game` mainloop.
 pub fn main() {
+    let x = 20;
+    let y = 20;
+    let span = 30;
+    let window_size = calc_window_size(x, y, span);
+
     let mut c = conf::Conf::new();
-    c.window_mode.width = 640;
-    c.window_mode.height = 640;
+    c.window_mode.width = window_size.0;
+    c.window_mode.height = window_size.1;
     c.window_mode.vsync = true;
     c.window_setup.resizable = true;
     let ctx = &mut Context::load_from_conf("rs_lifegame", "mynz", c).unwrap();
@@ -346,7 +357,7 @@ pub fn main() {
         ctx.filesystem.mount(&path, true);
     }
 
-    let state = &mut MainState::new(ctx).unwrap();
+    let state = &mut MainState::new(ctx, x, y, span).unwrap();
     if let Err(e) = event::run(ctx, state) {
         println!("Error encountered: {}", e);
     } else {
