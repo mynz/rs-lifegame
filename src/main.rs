@@ -211,6 +211,7 @@ struct MainState {
     text: graphics::Text,
     frames: usize,
     debug_mode: bool,
+    auto_step: bool,
 }
 
 impl MainState {
@@ -228,6 +229,7 @@ impl MainState {
             text,
             frames: 0,
             debug_mode: false,
+            auto_step: false,
         };
         Ok(s)
     }
@@ -261,6 +263,10 @@ impl ggez::event::EventHandler for MainState {
 
             Keycode::Space | Keycode::N => {
                 self.grid.next_generation();
+            }
+
+            Keycode::Enter => {
+                self.auto_step = !self.auto_step;
             }
             _ => {}
         }
