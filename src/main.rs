@@ -46,7 +46,7 @@ impl<'a> std::iter::Iterator for GridIter<'a> {
 fn test_grid_iter() {
     assert!(true);
 
-    let grid = Grid::new(2, 2);
+    let grid = Grid::new(2, 2, 30);
 
     {
         let mut iter = grid.get_iter();
@@ -289,7 +289,13 @@ impl ggez::event::EventHandler for MainState {
         self.grid.toggle_cell((gx, gy));
     }
 
-    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
+    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
+        if self.auto_step {
+            if timer::check_update_time(ctx, 60) {
+                self.grid.next_generation();
+            }
+        }
+
         Ok(())
     }
 
