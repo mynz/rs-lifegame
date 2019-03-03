@@ -8,6 +8,7 @@ extern crate rand;
 use ggez::conf;
 use ggez::event::{self, Keycode, Mod, MouseButton};
 use ggez::graphics;
+use ggez::timer;
 use ggez::{Context, GameResult};
 //use rand::random;
 use std::env;
@@ -265,7 +266,7 @@ impl ggez::event::EventHandler for MainState {
                 self.grid.next_generation();
             }
 
-            Keycode::Enter => {
+            Keycode::Return => {
                 self.auto_step = !self.auto_step;
             }
             _ => {}
